@@ -20,11 +20,20 @@ class Gameboard{
         let y = startingCoordinate[1];
 
         if (direction === "topToBot"){
-            for (let index = 0; index < length; index++) {
-                this.board[0][0] = newShip
+            for (let index = 0; index < length; index++){
+                this.board[x + index][y] = newShip
+            }
+        }
+        if (direction === "leftToRight"){
+            for (let index = 0; index < length; index++){
+                this.board[x][y + index] = newShip
             }
         }
         return this.board
+    }
+
+    receiveAttack = (coordinate) => {
+        
     }
 }
 
