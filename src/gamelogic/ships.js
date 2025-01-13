@@ -4,9 +4,11 @@ class Ship {
         this.hits = 0;
         this.sunk = false;
     }
+
     hit = () => {
-        this.hits = this.hits + 1
-        this.sunk = isSunk()
+        this.hits = this.hits + 1;
+        this.sunk = this.isSunk();
+        return this.sunk;
     }
 
     isSunk = () => {
