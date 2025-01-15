@@ -1,7 +1,8 @@
 import {
     Gameboard,
-    Ship
-} from "./gameboard.js"; 
+    Ship,
+    player
+} from "./player.js"; 
 
 
 
