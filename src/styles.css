@@ -1,18 +1,38 @@
 *{
     background-color: rebeccapurple;
-    border: solid red 1px;
+    border: solid green 1px;
 }
-
-.touchedCell{
-    background-color: orange
+.frontPage{
+    justify-content: center;
+    align-items: center;
 }
 
 .cell{
-    height: 10px;
-    width: 10px;
+    height: 20px;
+    width: 20px;
     background: blue;
+    border: none;
+    outline: 2px solid black
 }
 
-.container{
- border:solid black 2px;
+.cell:hover{
+    background: green;
+}
+#container{
+    border:solid black 2px;
+
+    display: grid;
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(10, 20px);
+
+    justify-content: center;
+
+
+    height: auto;
+    width: auto;
+}
+
+.rowContainer{
+    height:500;
+    width: 500;
 }
