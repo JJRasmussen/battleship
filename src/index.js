@@ -8,3 +8,5 @@ function cellHover(){
 
 };
 */
+
+import "./domManipulation/makeGameBoard.js"

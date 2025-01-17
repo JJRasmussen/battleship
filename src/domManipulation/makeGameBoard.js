@@ -1,6 +1,6 @@
-const container = document.querySelector("#container")
+import {allowDrop, drop} from "./dragAndDrop.js"
 
-let boardCreation = (container) => {
+const boardCreation = (container, boardType) => {
     for (let i = 0; i < 10; i++) {
         let rowId= "r" + i.toString();
         const createRow = document.createElement("div");
@@ -17,6 +17,10 @@ let boardCreation = (container) => {
             const createCell = document.createElement("div");
             createCell.setAttribute("class", "cell");
             createCell.setAttribute("id", cellId);
+            if (boardType === "setupBoard"){
+            createCell.addEventListener("drop", drop);
+            createCell.addEventListener("dragover", allowDrop);
+            }
             //attach cell to the given row
             targetRow.appendChild(createCell)
         }
@@ -24,3 +28,5 @@ let boardCreation = (container) => {
 }
 
 export {boardCreation}
+
+

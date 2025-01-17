@@ -1,12 +1,14 @@
 import {boardCreation} from "./makeGameBoard.js"
+import {Gameboard, Ship} from "../gamelogic/gameboard.js"
+import {drag} from "./dragAndDrop.js"
+
+
 const mainPage = document.querySelector(".mainPage")
 const gameTitle = document.querySelector("#gameTitle")
 const newGameButton = document.querySelector(".newGameButton")
 const gameForm = document.querySelector("#newGame")
-const test = document.querySelector(".test")
 
-
-function newGame(event){
+function startNewGame(event){
     //get player name or default to "John Doe"
     let playerName = document.forms["newGame"]["playerName"].value
     if (playerName === ""){
@@ -24,14 +26,29 @@ function newGame(event){
         boardContainer.setAttribute("id", "boardPreperation");
         mainPage.appendChild(boardContainer);
 
-    boardCreation(boardContainer);
+    boardCreation(boardContainer, "setupBoard");
     
+
+    //make ships available for placement
+    const dragAndDropShip = document.createElement("div");
+    dragAndDropShip.setAttribute("id", "ship" + "1");
+    dragAndDropShip.setAttribute("class", "dragAndDropShip");
+    //make ships dragable
+    dragAndDropShip.setAttribute("draggable", "true");
+    dragAndDropShip.addEventListener("dragstart", drag)
+    mainPage.appendChild(dragAndDropShip)
+
+    //add axis button
+    const axisButton = document.createElement("buttton");
     
-    //clear the page
+    mainPage.appendChild(axisButton)
+
+
+    //clean up the page
     gameTitle.remove();
     newGameButton.remove();
     gameForm.remove();
 };
 
-newGameButton.addEventListener("click", newGame);
+newGameButton.addEventListener("click", startNewGame);
 
