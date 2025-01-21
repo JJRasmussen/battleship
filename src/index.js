@@ -1,5 +1,5 @@
 import "./styles.css";
-import "./domManipulation/frontPage.js"
+import "./domManipulation/setupPage/setupPage.js"
 console.log("hello");
 /*
 function cellHover(){
