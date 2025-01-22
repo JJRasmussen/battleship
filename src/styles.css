@@ -54,6 +54,10 @@
     width: fit-content;
 }
 
+.beingDragged{
+    display:none
+}
+
 .shipCell {
     background: gray;
 

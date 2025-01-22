@@ -1,8 +1,7 @@
 import {boardCreation} from "../makeGameBoard.js"
 import {greetingsPlayer} from "./greetingMessage.js"
 import {setupShips} from "./setupShips.js"
-import {drag, drop, dragOver, dragEnter, dragLeave, getCellId} from "./dragAndDrop.js"
-
+import {drag, drop, dragOver, dragEnter, dragLeave, getCellIndex} from "./dragAndDrop.js"
 
 const mainPage = document.querySelector(".mainPage")
 const gameTitle = document.querySelector("#gameTitle")
@@ -30,7 +29,7 @@ function startNewGame(event){
     
     //create and place the ships next to the board
     //make the ships dragable
-    setupShips(mainPage, drag, getCellId);
+    setupShips(mainPage, drag, getCellIndex);
 
     //add axis button
 
