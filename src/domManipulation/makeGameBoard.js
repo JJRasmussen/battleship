@@ -1,7 +1,6 @@
 import {drop, dragOver, dragEnter, dragLeave} from "./setupPage/dragAndDrop.js"
 
 const boardCreation = (container, boardType) => {
-
     for (let i = 0; i < 10; i++) {
         let rowId= "r" + i.toString();
         const createRow = document.createElement("div");

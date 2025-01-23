@@ -14,14 +14,14 @@ function startNewGame(event){
     if (playerName === ""){
         playerName = "John Doe"
     }
-
+    
     //make container for greeting message 
     greetingsPlayer(mainPage, playerName)
 
     //make location where the setup board shall be placed
     const boardContainer = document.createElement("div");
     boardContainer.setAttribute("class", "boardContainer");
-    boardContainer.setAttribute("id", "boardPreperation");
+    boardContainer.setAttribute("id", "boardPreparation");
     mainPage.appendChild(boardContainer);
 
     //create setupBoard where ships will be placed

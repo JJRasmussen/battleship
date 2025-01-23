@@ -11,12 +11,12 @@ for (let i = 0; i < shipLengths.length; i++) {
     dragAndDropShip.setAttribute("id", "ship" + i.toString());
     dragAndDropShip.setAttribute("class", "dragAndDropShip");
     dragAndDropShip.setAttribute("data-shipLength", shipLengths[i].toString())
+    dragAndDropShip.setAttribute("data-onBoard", false)
     
     for (let j = 0; j < shipLengths[i]; j++) {
         const shipCell = document.createElement("div");
         shipCell.setAttribute("id", "ship" + i + "cell" + j);
-        shipCell.setAttribute("class", "shipCell")
-        shipCell.setAttribute("class", "cell");
+        shipCell.classList.add("cell", "shipCell")
         shipCell.setAttribute("data-index", j.toString())
         shipCell.addEventListener("mousedown", getCellIndex)
         dragAndDropShip.appendChild(shipCell)
