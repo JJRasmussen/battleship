@@ -12,8 +12,8 @@
     border-radius: 8px;
     position: relative;
     display: grid;
-    grid-template-columns: repeat(10, 24px);
-    grid-template-rows: repeat(10, 24px);
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(10, 20px);
     justify-content: center;
     justify-self: center;
     height: fit-content;
@@ -25,15 +25,18 @@
     width: 20px;
     background: rgb(189, 189, 189);
     border: none;
-    border: 2px solid black
+    outline: 2px solid black
 }
 
 .cell:hover{
     background: green;
 }
 
-.shipHighlight{
+.validPlacement{
     background: grey;
+}
+.invalidPlacement{
+    background: rgb(222, 75, 75)
 }
 
 
@@ -56,7 +59,6 @@
 
 .onBoard{
     position: absolute;
-    background: red;
 }
 
 .placedShipInCell{
