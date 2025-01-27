@@ -3,11 +3,14 @@ let grabbedCellIndex = null
 let shipId = null
 let shipLength = null
 let currentValidatedCells = []
+let currentCellsValidated = false
 let lastValidatedCells = []
+let lastCellsValidated = false
 let currentQueriedCells = []
 let lastQueriedCells = []
 let currentCellsEntered = null
 let cellsLeftBehind = null
+let cellEntered = false
 
 //the ships are located on and between the noted coordinate
 let shipPositions = [[],[],[],[],[]]
@@ -18,8 +21,7 @@ function getCellIndex(e){
 
 function dragOver(e){
     e.preventDefault()
-    //console.log(this.id)
-    console.log(this.id)
+    //kører mange gange pr sekund
 }
 
 function validPlacement(cellId){
@@ -49,52 +51,72 @@ function validPlacement(cellId){
     currentQueriedCells = targetCells
 }
 
+function placementClassToggle(addOrRemove, cellsTargeted, testRequirement){
+    if(addOrRemove === "add"){
+        for (let i = 0; i < cellsTargeted.length; i++) {
+            if(cellsTargeted[i] === null){continue}
+            if(testRequirement){
+                cellsTargeted[i].classList.add("validPlacement")
+            } else {
+                cellsTargeted[i].classList.add("invalidPlacement")
+            }
+        }
+    }
+    if(addOrRemove === "remove"){ 
+        for (let i = 0; i < cellsTargeted.length; i++) {
+            if(cellsTargeted[i] === null){continue}
+            cellsTargeted[i].classList.remove("validPlacement")
+            cellsTargeted[i].classList.remove("invalidPlacement")
+        }
+    }
+}
+
 function dragEnter(e){
-    console.log("enter")
-    //identify if placement is valid
+    //flag that new cells were entered
+    cellEntered = true
+    //log queries and validation of the last cells
     lastQueriedCells = currentQueriedCells;
     lastValidatedCells = currentValidatedCells;
+    lastCellsValidated = currentCellsValidated
+    //validate and query new cells
     validPlacement(this.id);
-    currentCellsEntered = currentQueriedCells.filter(cell => !lastQueriedCells.includes(cell));
-    for (let i = 0; i < currentCellsEntered.length; i++) {
-        if(currentCellsEntered[i] === null){continue}
-        if(currentValidatedCells.filter(Boolean).length.toString() === shipLength){
-            currentCellsEntered[i].classList.add("validPlacement")  
-        } else { console.log("currentQueriedCells are: " + currentQueriedCells)
-            currentCellsEntered[i].classList.add("invalidPlacement")
-        }
+    currentCellsEntered = currentQueriedCells.filter(cell => cell != null);
+    currentCellsValidated = currentValidatedCells.filter(Boolean).length.toString() === shipLength
+    console.log(currentCellsValidated)
+    //add class "validPlacement" or "invalidPlacement"
+    if(currentCellsValidated === true){
+        console.log("currentQueriedCells")
+        console.log(currentQueriedCells)
+        placementClassToggle("remove", currentQueriedCells, currentCellsValidated)
+        placementClassToggle("add", currentQueriedCells, currentCellsValidated)
+    } else {
+        console.log("currentQueriedCells")
+        console.log(currentQueriedCells)
+        console.log("currentCellsEntered")
+        console.log(currentCellsEntered)
+        placementClassToggle("remove", currentCellsEntered, currentCellsValidated)
+        placementClassToggle("add", currentCellsEntered, currentCellsValidated)
     }
 }
 
 function dragLeave(e){
-    console.log("leave")
-    let cellsLeftBehind = lastQueriedCells.filter(cell => !currentQueriedCells.includes(cell));
-    console.log("cellsLeftBehind: " + cellsLeftBehind)
-
-    for (let i = 0; i < cellsLeftBehind.length; i++) {
-        if(cellsLeftBehind[i] === null){continue}
-        if(cellsLeftBehind[i].classList.contains("validPlacement")){
-            cellsLeftBehind[i].classList.remove("validPlacement")  
-        } else {
-            cellsLeftBehind[i].classList.remove("invalidPlacement")
-        }
+    if(cellEntered === false){
+        //if CellEntered is false the drag has left the board or hovers a ship
+        cellsLeftBehind = currentQueriedCells
+        currentCellsEntered = []
+        lastQueriedCells = []
+    } else { 
+        cellsLeftBehind = lastQueriedCells.filter(cell => !currentQueriedCells.includes(cell))
     }
-}
-
-function dragLeaveBoard(e){
-    console.log("boardLeft")
+    placementClassToggle("remove", cellsLeftBehind, undefined)
+    cellEntered = false
 }
 
 function drag(e){
     shipLength = e.target.getAttribute('data-shipLength');
     shipId = e.target.id;
-    console.log("length of ship is: " + shipLength);
-    console.log("grabbedShipCell is: " + grabbedCellIndex);
-    console.log("shipId is: " + shipId)
-
     if (e.target.getAttribute('data-onBoard') === "true"){
         for (let i = 0; i < shipLength; i++) {
-            console.log("a ship is being moved around")
             shipPositions[parseInt(shipId.slice(-1))][i].classList.remove('placedShip', 'validPlacement')
         }
     }
@@ -147,4 +169,4 @@ function drop(e){
     lastQueriedCells = []
 }
 
-export {dragOver, drop, drag, dragEnter, dragLeave, dragLeaveBoard, getCellIndex}
+export {dragOver, drop, drag, dragEnter, dragLeave, getCellIndex}

@@ -1,4 +1,4 @@
-import {drop, dragOver, dragEnter, dragLeave, dragLeaveBoard} from "./setupPage/dragAndDrop.js"
+import {drop, dragOver, dragEnter, dragLeave} from "./setupPage/dragAndDrop.js"
 
 const boardCreation = (container, boardType) => {
     for (let i = 0; i < 10; i++) {
@@ -27,9 +27,6 @@ const boardCreation = (container, boardType) => {
             //attach cell to the given row
             targetRow.appendChild(createCell)
         }
-    }
-    if(boardType === "setupBoard"){
-        container.addEventListener("dragleave", dragLeaveBoard)
     }
 }
 
