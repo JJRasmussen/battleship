@@ -1,7 +1,10 @@
 import {boardCreation} from "../makeGameBoard.js"
 import {greetingsPlayer} from "./greetingMessage.js"
 import {setupShips} from "./setupShips.js"
+import {queryShips, queryShipContainers} from "./queryShips.js"
 import {drag, dragOver, dropOnDisplay, getCellIndex, changeAxis} from "./dragAndDrop.js"
+import {resetShipLocations, queryContainers} from "./resetShipLocations.js"
+import {queryToggleButton} from "./axis.js"
 
 
 const mainPage = document.querySelector(".mainPage")
@@ -39,8 +42,11 @@ function startNewGame(event){
     shipDisplay.addEventListener("dragover", dragOver)
     shipDisplay.addEventListener("drop", dropOnDisplay)
     setupPage.appendChild(shipDisplay);
-    //make the ships dragable
+    //make the ships dragable and query them
     setupShips(shipDisplay, drag, getCellIndex);
+    queryShips()
+    queryShipContainers()
+    queryContainers()
 
     //add axis button
     const axisToggleButton = document.createElement("button");
@@ -49,6 +55,15 @@ function startNewGame(event){
     axisToggleButton.textContent = "Change the axis of the ships in the display"
     axisToggleButton.addEventListener("click", changeAxis)
     setupPage.appendChild(axisToggleButton)
+    queryToggleButton()
+
+    //add reset button
+    const resetSetupBoardButton = document.createElement("button");
+    resetSetupBoardButton.setAttribute("type", "button")
+    resetSetupBoardButton.classList.add("axisButton")
+    resetSetupBoardButton.textContent = "reset ship locations"
+    resetSetupBoardButton.addEventListener("click", resetShipLocations)
+    setupPage.appendChild(resetSetupBoardButton)
 
     //clean up the page
     gameTitle.remove();

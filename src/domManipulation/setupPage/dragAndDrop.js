@@ -1,3 +1,6 @@
+import {recordPlacementOfShip, shipPutBackOnDisplay} from "./trackingShipPlacements.js"
+import {getQueriedShips} from "./queryShips.js"
+import {getAxis, changeAxis} from "./axis.js"
 //used in getCellindex to know which specific childElement was being grabbed when the parent ship is being dragged
 let grabbedCellIndex = null
 let shipId = null
@@ -16,26 +19,7 @@ let axis = "topToBottom"
 
 //the ships are located on and between the noted coordinate
 let shipPositionsOnSetupBoard = [[],[],[],[],[]]
-let shipPositionsForGameBoard = [[],[],[],[],[]]
 
-function changeAxis(){
-    axis = axis === "topToBottom" ? "leftToRight" : "topToBottom";
-
-    let shipInDisplay = document.querySelectorAll(".shipInDisplay")
-    if(axis === "topToBottom"){
-        for (let i = 0; i < shipInDisplay.length; i++) {
-            shipInDisplay[i].classList.remove("leftToRight")
-            shipInDisplay[i].classList.add("topToBottom")
-        }
-    } else {
-        for (let i = 0; i < shipInDisplay.length; i++) {
-            shipInDisplay[i].classList.remove("topToBottom")
-            shipInDisplay[i].classList.add("leftToRight")
-        } 
-    }
-    let axisToggleButton = document.querySelector(".axisButton")
-    axisToggleButton.textContent = `${axis}`    
-}
 
 function getCellIndex(e){
     grabbedCellIndex = e.target.getAttribute('data-index')
@@ -157,22 +141,14 @@ function drag(e){
     }
 }
 
-class shipPosition {
-    constructor(shipId, length, startCoordinate, axis){
-        this.shipId = shipId
-        this.length = length
-        this.startCoordinate = startCoordinate
-        this.axis = axis
-    }
-}
-
 function drop(e){
     e.preventDefault();
     //all cells where the ship is being dropped needs to be available
     if(currentValidationResult.filter(Boolean).length.toString() != shipLength){return}
 
-    let droppedShip = document.querySelector("#" +  shipId)
-    //if the ship is moved from the display onto the board
+    let droppedShip = getQueriedShips()[shipId.slice(-1)]
+    console.log(droppedShip)
+    //check if the ship has already been moved from the display onto the board
     if (droppedShip.getAttribute('data-onBoard') === "false"){
         //ship element moved to the board
         let boardContainer = document.querySelector("#boardPreparation")
@@ -214,14 +190,12 @@ function drop(e){
         currentQueriedCells[i].classList.remove("validPlacement", "invalidPlacement")
         currentQueriedCells[i].classList.add("placedShip")
     }
-
-    //record placement of the ships    
+    //record placement of the ships for dom manipulation  
     for (let i = 0; i < shipLength; i++) {
         shipPositionsOnSetupBoard[parseInt(shipId.slice(-1))][i] = currentQueriedCells[i]
     }
     //make shipPlacementObjects for game board
-    let placedShip = new shipPosition(shipId, shipLength, currentQueriedCells[0].id.slice(-2), shipAxis)
-    shipPositionsForGameBoard[parseInt(shipId.slice(-1))] = placedShip
+    recordPlacementOfShip(parseInt(shipId.slice(-1)), shipLength, currentQueriedCells[0].id.slice(-2), shipAxis)
 
     //reset varriables
     currentValidationResult = []
@@ -232,7 +206,7 @@ function drop(e){
 
 function dropOnDisplay(e){
     e.preventDefault();
-    let shipInDisplay = document.querySelector("#" +  shipId)
+    let shipInDisplay = getQueriedShips()[shipId.slice(-1)]
     //change data and class on ship
     shipInDisplay.setAttribute('data-onBoard', "false");
     //change css styling so the ship shrinks in the display
@@ -240,8 +214,8 @@ function dropOnDisplay(e){
     //change css styling so the ship is no longer locked in its axis
     shipInDisplay.classList.add("shipInDisplay")
     //flip the axis of the ship so it matches the current axis setting
-    if(!shipInDisplay.classList.contains(`${axis}`)){            
-        if(axis === "topToBottom"){
+    if(!shipInDisplay.classList.contains(`${getAxis()}`)){            
+        if(getAxis() === "topToBottom"){
         shipInDisplay.classList.remove("leftToRight")
         shipInDisplay.classList.add("topToBottom")
     } else{
@@ -254,7 +228,7 @@ function dropOnDisplay(e){
     shipContainer.appendChild(shipInDisplay);
 
     //remove the created object that recorded the placement of the ship
-    shipPositionsForGameBoard[parseInt(shipId.slice(-1))] = []
+    shipPutBackOnDisplay(parseInt(shipId.slice(-1)))
 
     //reset varriables
     currentValidationResult = []
