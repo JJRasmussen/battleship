@@ -15,11 +15,14 @@ let lastValidationResult = []
 let currentCellsEntered = null
 let cellsLeftBehind = null
 let cellEntered = false
-let axis = "topToBottom"
 
 //the ships are located on and between the noted coordinate
 let shipPositionsOnSetupBoard = [[],[],[],[],[]]
 
+function getShipPositionsOnSetupBoard(){
+    console.log(shipPositionsOnSetupBoard)
+    return shipPositionsOnSetupBoard
+}
 
 function getCellIndex(e){
     grabbedCellIndex = e.target.getAttribute('data-index')
@@ -238,4 +241,4 @@ function dropOnDisplay(e){
 }
 
 
-export {dragOver, drop, dropOnDisplay, drag, dragEnter, dragLeave, getCellIndex, changeAxis}
+export {dragOver, drop, dropOnDisplay, drag, dragEnter, dragLeave, getCellIndex, changeAxis, getShipPositionsOnSetupBoard}

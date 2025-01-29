@@ -1,5 +1,3 @@
-import {getQueriedShips} from "./queryShips.js"
-
 let axis = "topToBottom"
 let axisToggleButton = null
 

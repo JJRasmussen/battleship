@@ -112,8 +112,8 @@
     height: 32px;
     width: 32px;
 }
-.placedShipInCell{
-    background: red;
+.placedShip{
+    background: purple;
 }
 .axisButton{
     height: 50px;
