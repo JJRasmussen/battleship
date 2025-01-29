@@ -2,18 +2,40 @@
 let grabbedCellIndex = null
 let shipId = null
 let shipLength = null
-let currentValidatedCells = []
+let shipAxis = null
+let currentValidationResult = []
 let currentCellsValidated = false
-let lastValidatedCells = []
-let lastCellsValidated = false
 let currentQueriedCells = []
 let lastQueriedCells = []
+let lastCellsValidated = []
+let lastValidationResult = []
 let currentCellsEntered = null
 let cellsLeftBehind = null
 let cellEntered = false
+let axis = "topToBottom"
 
 //the ships are located on and between the noted coordinate
-let shipPositions = [[],[],[],[],[]]
+let shipPositionsOnSetupBoard = [[],[],[],[],[]]
+let shipPositionsForGameBoard = [[],[],[],[],[]]
+
+function changeAxis(){
+    axis = axis === "topToBottom" ? "leftToRight" : "topToBottom";
+
+    let shipInDisplay = document.querySelectorAll(".shipInDisplay")
+    if(axis === "topToBottom"){
+        for (let i = 0; i < shipInDisplay.length; i++) {
+            shipInDisplay[i].classList.remove("leftToRight")
+            shipInDisplay[i].classList.add("topToBottom")
+        }
+    } else {
+        for (let i = 0; i < shipInDisplay.length; i++) {
+            shipInDisplay[i].classList.remove("topToBottom")
+            shipInDisplay[i].classList.add("leftToRight")
+        } 
+    }
+    let axisToggleButton = document.querySelector(".axisButton")
+    axisToggleButton.textContent = `${axis}`    
+}
 
 function getCellIndex(e){
     grabbedCellIndex = e.target.getAttribute('data-index')
@@ -21,16 +43,24 @@ function getCellIndex(e){
 
 function dragOver(e){
     e.preventDefault()
-    //kører mange gange pr sekund
 }
 
 function validPlacement(cellId){
     let targetCells = []
     let cellValidity = []
     for (let i = 0; i < shipLength; i++) {
-        let shiftAccordingToGrabbedCell = parseInt(cellId.slice(-1)) + i - grabbedCellIndex
-        targetCells[i] = cellId.slice(0, -1)
-        targetCells[i] = targetCells[i].concat(shiftAccordingToGrabbedCell)
+        //
+        if(shipAxis === "topToBottom"){
+            let shiftAccordingToGrabbedCell = parseInt(cellId.slice(-1)) + i - grabbedCellIndex
+            targetCells[i] = cellId.slice(0, -1)
+            targetCells[i] = targetCells[i].concat(shiftAccordingToGrabbedCell)
+        } else {
+            let shiftAccordingToGrabbedCell = parseInt(cellId.slice(-2, -1)) + i - grabbedCellIndex
+            let rowStorage = cellId.slice(-1)
+            targetCells[i] = cellId.slice(0, -2)
+            targetCells[i] = targetCells[i].concat(shiftAccordingToGrabbedCell)
+            targetCells[i] = targetCells[i].concat(rowStorage)
+        }
         //check if a cell will end outside of the board
         if (document.querySelector("#" + targetCells[i]) === null){
             targetCells[i] = null
@@ -47,8 +77,13 @@ function validPlacement(cellId){
             cellValidity[i] = true
         }        
     }
-    currentValidatedCells = cellValidity
-    currentQueriedCells = targetCells
+    currentValidationResult = cellValidity
+    currentQueriedCells = targetCells    
+    console.log("currentQueriedCells:")
+    for (let i = 0; i < shipLength; i++) {
+        console.log(currentQueriedCells[i]);
+        
+    }
 }
 
 function placementClassToggle(addOrRemove, cellsTargeted, testRequirement){
@@ -76,24 +111,18 @@ function dragEnter(e){
     cellEntered = true
     //log queries and validation of the last cells
     lastQueriedCells = currentQueriedCells;
-    lastValidatedCells = currentValidatedCells;
+    lastValidationResult = currentValidationResult;
     lastCellsValidated = currentCellsValidated
     //validate and query new cells
     validPlacement(this.id);
     currentCellsEntered = currentQueriedCells.filter(cell => cell != null);
-    currentCellsValidated = currentValidatedCells.filter(Boolean).length.toString() === shipLength
+    currentCellsValidated = currentValidationResult.filter(Boolean).length.toString() === shipLength
     console.log(currentCellsValidated)
     //add class "validPlacement" or "invalidPlacement"
     if(currentCellsValidated === true){
-        console.log("currentQueriedCells")
-        console.log(currentQueriedCells)
         placementClassToggle("remove", currentQueriedCells, currentCellsValidated)
         placementClassToggle("add", currentQueriedCells, currentCellsValidated)
     } else {
-        console.log("currentQueriedCells")
-        console.log(currentQueriedCells)
-        console.log("currentCellsEntered")
-        console.log(currentCellsEntered)
         placementClassToggle("remove", currentCellsEntered, currentCellsValidated)
         placementClassToggle("add", currentCellsEntered, currentCellsValidated)
     }
@@ -113,39 +142,72 @@ function dragLeave(e){
 }
 
 function drag(e){
+    e.stopPropagation()
     shipLength = e.target.getAttribute('data-shipLength');
     shipId = e.target.id;
-    if (e.target.getAttribute('data-onBoard') === "true"){
-        for (let i = 0; i < shipLength; i++) {
-            shipPositions[parseInt(shipId.slice(-1))][i].classList.remove('placedShip', 'validPlacement')
+    if(e.target.classList.contains("topToBottom")){
+        shipAxis = "topToBottom"
+    } else {
+        shipAxis = "leftToRight"
+    }
+    if (e.target.getAttribute('data-onBoard') === "true") {
+    for (let i = 0; i < shipLength; i++) {
+        shipPositionsOnSetupBoard[parseInt(shipId.slice(-1))][i].classList.remove('placedShip', 'validPlacement')
         }
+    }
+}
+
+class shipPosition {
+    constructor(shipId, length, startCoordinate, axis){
+        this.shipId = shipId
+        this.length = length
+        this.startCoordinate = startCoordinate
+        this.axis = axis
     }
 }
 
 function drop(e){
     e.preventDefault();
     //all cells where the ship is being dropped needs to be available
-    if(currentValidatedCells.filter(Boolean).length.toString() != shipLength){return}
+    if(currentValidationResult.filter(Boolean).length.toString() != shipLength){return}
 
-    let shipInDisplay = document.querySelector("#" +  shipId)
+    let droppedShip = document.querySelector("#" +  shipId)
     //if the ship is moved from the display onto the board
-    if (shipInDisplay.getAttribute('data-onBoard') === "false"){
+    if (droppedShip.getAttribute('data-onBoard') === "false"){
         //ship element moved to the board
         let boardContainer = document.querySelector("#boardPreparation")
-        shipInDisplay.setAttribute('data-onBoard', "true")
-        boardContainer.appendChild(shipInDisplay)
+        droppedShip.setAttribute('data-onBoard', "true")
+        boardContainer.appendChild(droppedShip)
         //change css styling so the ship overlaps correct cells
-        shipInDisplay.classList.add("onBoard")
+        droppedShip.classList.add("onBoard")
+        //change css styling so the ship is locked to its axis
+        droppedShip.classList.remove("shipInDisplay")
+
     }       
     //calculate the absolute placement is used so the movement goes downwards:
     let cellWidth = e.target.offsetWidth
-    let offset = grabbedCellIndex
-    let targetRow = e.target.id.slice(-1) - offset
-    let targetColumn = e.target.id.slice(-2, -1)
-    let columnPlacement = cellWidth * (targetColumn)
-    let rowPlacement = cellWidth * (targetRow)      
-    shipInDisplay.style.left = `${columnPlacement}px`
-    shipInDisplay.style.top = `${rowPlacement}px`
+    let columnPlacement = null
+    let rowPlacement = null
+    let targetColumn = null
+    let targetRow  = null
+    if (droppedShip.classList.contains("topToBottom")){
+        let shipAxis = "topToBottom"
+    } else {
+        let shipAxis = "leftToRight"
+    }
+    if(shipAxis === "topToBottom"){
+        let rowOffSet = grabbedCellIndex
+        targetRow = e.target.id.slice(-1) - rowOffSet
+        targetColumn = e.target.id.slice(-2, -1)
+    } else {
+        let columnOffSet = grabbedCellIndex
+        targetRow = e.target.id.slice(-1)
+        targetColumn = e.target.id.slice(-2, -1) - columnOffSet
+    }
+    columnPlacement = cellWidth * (targetColumn)
+    rowPlacement = cellWidth * (targetRow)      
+    droppedShip.style.left = `${columnPlacement}px`
+    droppedShip.style.top = `${rowPlacement}px`
 
     //mark cells in the grid as occupied
     for (let i = 0; i < currentQueriedCells.length; i++) {
@@ -153,20 +215,53 @@ function drop(e){
         currentQueriedCells[i].classList.add("placedShip")
     }
 
-    //record placement of the ships
+    //record placement of the ships    
     for (let i = 0; i < shipLength; i++) {
-        shipPositions[parseInt(shipId.slice(-1))][i] = currentQueriedCells[i]
+        shipPositionsOnSetupBoard[parseInt(shipId.slice(-1))][i] = currentQueriedCells[i]
     }
-    for (let i = 0; i < shipPositions.length; i++) {
-        console.log("shipPositions of ship" + i + " are " + shipPositions[i])   
-    }
-    console.log(`Dropped cell ${grabbedCellIndex} of ship with id ${shipId} and ship length of ${shipLength}`)
-    
+    //make shipPlacementObjects for game board
+    let placedShip = new shipPosition(shipId, shipLength, currentQueriedCells[0].id.slice(-2), shipAxis)
+    shipPositionsForGameBoard[parseInt(shipId.slice(-1))] = placedShip
+
     //reset varriables
-    currentValidatedCells = []
-    lastValidatedCells = []
+    currentValidationResult = []
+    lastValidationResult = []
     currentQueriedCells = []
     lastQueriedCells = []
 }
 
-export {dragOver, drop, drag, dragEnter, dragLeave, getCellIndex}
+function dropOnDisplay(e){
+    e.preventDefault();
+    let shipInDisplay = document.querySelector("#" +  shipId)
+    //change data and class on ship
+    shipInDisplay.setAttribute('data-onBoard', "false");
+    //change css styling so the ship shrinks in the display
+    shipInDisplay.classList.remove("onBoard")
+    //change css styling so the ship is no longer locked in its axis
+    shipInDisplay.classList.add("shipInDisplay")
+    //flip the axis of the ship so it matches the current axis setting
+    if(!shipInDisplay.classList.contains(`${axis}`)){            
+        if(axis === "topToBottom"){
+        shipInDisplay.classList.remove("leftToRight")
+        shipInDisplay.classList.add("topToBottom")
+    } else{
+        shipInDisplay.classList.remove("topToBottom")
+        shipInDisplay.classList.add("leftToRight")
+    }
+}
+    //place it in the proper container on the display
+    let shipContainer = document.querySelector("#container" + shipId.slice(-1))
+    shipContainer.appendChild(shipInDisplay);
+
+    //remove the created object that recorded the placement of the ship
+    shipPositionsForGameBoard[parseInt(shipId.slice(-1))] = []
+
+    //reset varriables
+    currentValidationResult = []
+    lastValidationResult = []
+    currentQueriedCells = []
+    lastQueriedCells = []
+}
+
+
+export {dragOver, drop, dropOnDisplay, drag, dragEnter, dragLeave, getCellIndex, changeAxis}

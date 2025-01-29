@@ -2,14 +2,14 @@
 
 const setupShips = (mainPage, drag, getCellIndex) => {
     const shipLengths = [2,3,3,4,5]
-    const shipContainer = document.createElement("div");
-    shipContainer.setAttribute("id", "shipContainer");
-    mainPage.appendChild(shipContainer)
-
 for (let i = 0; i < shipLengths.length; i++) {
+    const shipContainer = document.createElement("div");
+    shipContainer.classList.add("shipContainer", "containerSize" + shipLengths[i].toString());
+    shipContainer.setAttribute("id", "container" + i.toString());
+    mainPage.appendChild(shipContainer)
     let dragAndDropShip = document.createElement("div");
     dragAndDropShip.setAttribute("id", "ship" + i.toString());
-    dragAndDropShip.setAttribute("class", "dragAndDropShip");
+    dragAndDropShip.classList.add("dragAndDropShip", "shipInDisplay", "topToBottom");
     dragAndDropShip.setAttribute("data-shipLength", shipLengths[i].toString())
     dragAndDropShip.setAttribute("data-onBoard", false)
     
