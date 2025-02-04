@@ -5,10 +5,10 @@ const boardCreation = (container, boardType) => {
         let rowId= "r" + i.toString();
         const createRow = document.createElement("div");
         createRow.setAttribute("class", "rowContainer");
-        createRow.setAttribute("id", rowId);
+        createRow.setAttribute("id", boardType + rowId);
         container.appendChild(createRow);
         //query the given row, so cells can be attached later
-        const targetRow = document.querySelector("#"+rowId);
+        const targetRow = document.querySelector("#" + boardType +rowId);
         
         for (let j = 0; j < 10; j++){
             let columnId = "c" + j.toString();
@@ -16,13 +16,19 @@ const boardCreation = (container, boardType) => {
             //create cells 10 cells for each row
             const createCell = document.createElement("div");
             createCell.setAttribute("class", "cell");
-            createCell.setAttribute("id", cellId);
             //if the board is used for setup purposes
             if (boardType === "setupBoard"){
-            createCell.addEventListener("drop", drop);
-            createCell.addEventListener("dragover", dragOver);
-            createCell.addEventListener("dragleave", dragLeave);
-            createCell.addEventListener("dragenter", dragEnter);
+                createCell.setAttribute("id", "setup_" + cellId);
+                createCell.addEventListener("drop", drop);
+                createCell.addEventListener("dragover", dragOver);
+                createCell.addEventListener("dragleave", dragLeave);
+                createCell.addEventListener("dragenter", dragEnter);
+            }
+            if (boardType === "playerBoard"){
+                createCell.setAttribute("id", "player_" + cellId);
+            }
+            if (boardType === "enemyBoard"){
+                createCell.setAttribute("id", "enemy_" + cellId);
             }
             //DEV FEATURE:
             //

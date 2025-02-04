@@ -38,9 +38,13 @@ function getShipLocations(shipId){
     //tracking cells
     let queriedCellsCoveredByShip = []
     for (let i = 0; i < shipCoordinates.length; i++) {
-        queriedCellsCoveredByShip[i] = document.querySelector("#cell_" + shipCoordinates[i])
+        queriedCellsCoveredByShip[i] = document.querySelector("#setup_cell_" + shipCoordinates[i])
     }
     return queriedCellsCoveredByShip;
+}
+
+function getAllShipLocations(){
+    return shipPositionsForGameBoard
 }
 
 const getOccupiedCells = () => {
@@ -57,4 +61,4 @@ const getOccupiedCells = () => {
     }
     return occupiedCells
 }
-export{recordPlacementOfShip, shipPutBackOnDisplay, getShipLocations, getOccupiedCells, getShipAxis}
+export{recordPlacementOfShip, shipPutBackOnDisplay, getShipLocations, getOccupiedCells, getShipAxis, getAllShipLocations}

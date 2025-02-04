@@ -112,6 +112,12 @@
     height: 32px;
     width: 32px;
 }
+
+.shipOnPlayerBoard{
+    background: darkblue;
+    height: 32px;
+    width: 32px;
+}
 .placedShip{
     background: purple;
 }

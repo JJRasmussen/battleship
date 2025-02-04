@@ -47,13 +47,11 @@ function validPlacement(startingCoordinate, shipLength, axis = getAxis()){
     //determine validity of all coordinates
     for (let i = 0; i < shipCoordinates.length; i++) {
         // validate that the cells are on the board
-        if(document.querySelector("#cell_" + shipCoordinates[i]) === null || occupiedCells.includes(shipCoordinates[i])){
-            console.log("out of bounds or occupied")
+        if(document.querySelector("#setup_cell_" + shipCoordinates[i]) === null || occupiedCells.includes(shipCoordinates[i])){
             targetCells[i] = null
             cellValidations[i] = false
             continue
         } else {
-            console.log(shipCoordinates[i] + " is not occupied")
             cellValidations[i] = true
         } 
     }  
@@ -64,7 +62,7 @@ function queryValidatedCells(shipCoordinates, cellValidations){
     let queriedCells = []
     for (let i = 0; i < shipCoordinates.length; i++) {
         if(cellValidations[i] === true){
-            queriedCells.push(document.querySelector("#cell_" + shipCoordinates[i]))
+            queriedCells.push(document.querySelector("#setup_cell_" + shipCoordinates[i]))
         } else {
             continue
         }   

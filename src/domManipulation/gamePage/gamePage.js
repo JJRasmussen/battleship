@@ -1,39 +1,40 @@
+import {getAllShipLocations} from "../setupPage/helperFunctions/trackingShipPlacements.js"
+import {placeShipsOnBoard} from "./helperFunctions/shipsOnGameBoard.js"
 import {boardCreation} from "../makeGameBoard.js"
-import {greetingsPlayer} from "./helperFunctions/greetingMessage.js"
-import {setupShips} from "./helperFunctions/setupShips.js"
-import {queryShips, queryShipContainers} from "./helperFunctions/queryShips.js"
-import {drag, dragOver, dropOnDisplay, getCellIndex, changeAxis} from "./dragAndDrop.js"
-import {resetShipLocations, queryContainers} from "./resetShipLocations.js"
-import {queryToggleButton} from "./helperFunctions/axis.js"
-import {randomizeBoard} from "./randomizeBoard"
-import {startGame} from "../gamePage/gamePage.js"
-
-
+import {getRandomEnemyShips} from "../setupPage/randomizeBoard.js"
 const mainPage = document.querySelector(".mainPage")
-const gameTitle = document.querySelector("#gameTitle")
 const newGameButton = document.querySelector(".newGameButton")
-const gameForm = document.querySelector("#newGame")
 
-function setupGame(){
-    //get player name or default to "John Doe"
-    let playerName = document.forms["newGame"]["playerName"].value
-    if (playerName === ""){
-        playerName = "John Doe"
-    }
-    
-    //make container for greeting message 
-    greetingsPlayer(mainPage, playerName)
-
+function startGame(){
     //make location where the setup board and ship display shall be placed
-    const setupPage = document.createElement("div");
-    setupPage.setAttribute("class", "setupPage");
-    mainPage.appendChild(setupPage)
-    //make boardContainer
-    const boardContainer = document.createElement("div");
-    boardContainer.setAttribute("class", "boardContainer");
-    boardContainer.setAttribute("id", "boardPreparation");
-    setupPage.appendChild(boardContainer);
+    const gamePage = document.createElement("div");
+    gamePage.setAttribute("class", "gamePage");
+    mainPage.appendChild(gamePage)
 
+    //make player boardContainer
+    const playerBoard = document.createElement("div");
+    playerBoard.setAttribute("class", "boardContainer");
+    playerBoard.setAttribute("id", "playerBoard");
+    gamePage.appendChild(playerBoard);
+
+    //create gameBoard with players ships
+    boardCreation(playerBoard, "playerBoard")
+    let shipLocations = getAllShipLocations()
+    placeShipsOnBoard(shipLocations, "player");
+
+    //make enemy boardContainer
+    const enemyBoard = document.createElement("div");
+    enemyBoard.setAttribute("class", "boardContainer");
+    enemyBoard.setAttribute("id", "enemyBoard");
+    gamePage.appendChild(enemyBoard);
+    //get enemy positions
+    let enemyShipLocations = getRandomEnemyShips()
+    //create gameBoard with players ships
+    boardCreation(enemyBoard, "enemyBoard")
+    placeShipsOnBoard(enemyShipLocations, "enemy");
+
+
+/*
     //create setupBoard where ships will be placed
     boardCreation(boardContainer, "setupBoard");
     
@@ -74,20 +75,9 @@ function setupGame(){
     randomizeBoardButton.textContent = "Randomize ship positions"
     randomizeBoardButton.addEventListener("click", randomizeBoard)
     setupPage.appendChild(randomizeBoardButton)
-
-    //add start game button
-    const startGameButton = document.createElement("button");
-    startGameButton.setAttribute("type", "button");
-    startGameButton.classList.add("startGameButton", "setupButton")
-    startGameButton.textContent = "Start the Game"
-    startGameButton.addEventListener("click", startGame)
-    setupPage.appendChild(startGameButton)
-
-    //clean up the page
-    gameTitle.remove();
-    newGameButton.remove();
-    gameForm.remove();
+    //clean up the page*/
+    const setupPage = document.querySelector(".setupPage")
+    setupPage.remove();
 };
 
-newGameButton.addEventListener("click", setupGame);
-
+export{startGame}

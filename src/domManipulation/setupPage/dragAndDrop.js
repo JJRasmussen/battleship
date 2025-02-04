@@ -1,4 +1,4 @@
-import {getOccupiedCells, recordPlacementOfShip, shipPutBackOnDisplay, getShipAxis} from "./helperFunctions/trackingShipPlacements.js"
+import {recordPlacementOfShip, shipPutBackOnDisplay, getShipAxis} from "./helperFunctions/trackingShipPlacements.js"
 import {getQueriedShips} from "./helperFunctions/queryShips.js"
 import {getAxis, changeAxis} from "./helperFunctions/axis.js"
 import {getShipLocations} from "./helperFunctions/trackingShipPlacements.js"

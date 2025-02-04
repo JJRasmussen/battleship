@@ -1,5 +1,5 @@
 import {resetShipLocations} from "./resetShipLocations.js"
-import {recordPlacementOfShip} from "./helperFunctions/trackingShipPlacements.js"
+import {recordPlacementOfShip, getAllShipLocations} from "./helperFunctions/trackingShipPlacements.js"
 import {getQueriedShips} from "./helperFunctions/queryShips.js"
 import {randomAxis, getAxis} from "./helperFunctions/axis.js"
 import {coordinateWalk, validPlacement, queryValidatedCells} from "./helperFunctions/queryCells.js"
@@ -58,14 +58,13 @@ const randomizeBoard = () => {
         //change css styling so the ship is locked to its axis
         queriedShips[i].classList.remove("shipInDisplay")
     }
+    console.log(getAllShipLocations())
 }
-export {randomizeBoard}
-/*
 
-    //mark cells in the grid as occupied
-    for (let i = 0; i < currentQueriedCells.length; i++) {
-        currentQueriedCells[i].classList.remove("validPlacement", "invalidPlacement")
-        currentQueriedCells[i].classList.add("placedShip")
-    }
-    //make shipPlacementObjects for game board
-    recordPlacementOfShip(parseInt(shipId.slice(-1)), shipLength, currentQueriedCells[0].id.slice(-2), shipAxis)*/
+const getRandomEnemyShips = () => {
+    randomizeBoard()
+    let enemyShips = getAllShipLocations()
+    return enemyShips
+}
+
+export {randomizeBoard, getRandomEnemyShips}
