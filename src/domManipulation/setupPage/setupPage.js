@@ -1,10 +1,11 @@
 import {boardCreation} from "../makeGameBoard.js"
-import {greetingsPlayer} from "./greetingMessage.js"
-import {setupShips} from "./setupShips.js"
-import {queryShips, queryShipContainers} from "./queryShips.js"
+import {greetingsPlayer} from "./helperFunctions/greetingMessage.js"
+import {setupShips} from "./helperFunctions/setupShips.js"
+import {queryShips, queryShipContainers} from "./helperFunctions/queryShips.js"
 import {drag, dragOver, dropOnDisplay, getCellIndex, changeAxis} from "./dragAndDrop.js"
 import {resetShipLocations, queryContainers} from "./resetShipLocations.js"
-import {queryToggleButton} from "./axis.js"
+import {queryToggleButton} from "./helperFunctions/axis.js"
+import {randomizeBoard} from "./randomizeBoard"
 
 
 const mainPage = document.querySelector(".mainPage")
@@ -51,7 +52,7 @@ function startNewGame(event){
     //add axis button
     const axisToggleButton = document.createElement("button");
     axisToggleButton.setAttribute("type", "button")
-    axisToggleButton.classList.add("axisButton")
+    axisToggleButton.classList.add("axisButton", "setupButton")
     axisToggleButton.textContent = "Change the axis of the ships in the display"
     axisToggleButton.addEventListener("click", changeAxis)
     setupPage.appendChild(axisToggleButton)
@@ -60,11 +61,18 @@ function startNewGame(event){
     //add reset button
     const resetSetupBoardButton = document.createElement("button");
     resetSetupBoardButton.setAttribute("type", "button")
-    resetSetupBoardButton.classList.add("axisButton")
+    resetSetupBoardButton.classList.add("axisButton", "setupButton")
     resetSetupBoardButton.textContent = "reset ship locations"
     resetSetupBoardButton.addEventListener("click", resetShipLocations)
     setupPage.appendChild(resetSetupBoardButton)
 
+    //add randomize button
+    const randomizeBoardButton = document.createElement("button");
+    randomizeBoardButton.setAttribute("type", "button");
+    randomizeBoardButton.classList.add("randomizeButton", "setupButton")
+    randomizeBoardButton.textContent = "Randomize ship positions"
+    randomizeBoardButton.addEventListener("click", randomizeBoard)
+    setupPage.appendChild(randomizeBoardButton)
     //clean up the page
     gameTitle.remove();
     newGameButton.remove();

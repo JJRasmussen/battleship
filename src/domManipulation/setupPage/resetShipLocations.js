@@ -1,7 +1,6 @@
-import {shipPutBackOnDisplay, getShipLocations} from "./trackingShipPlacements.js"
-import {getQueriedShips, getQueriedShipContainers} from "./queryShips.js"
-import {getAxis} from "./axis.js"
-import {getShipPositionsOnSetupBoard} from "./dragAndDrop.js"
+import {shipPutBackOnDisplay, getShipLocations} from "./helperFunctions/trackingShipPlacements.js"
+import {getQueriedShips, getQueriedShipContainers} from "./helperFunctions/queryShips.js"
+import {getAxis} from "./helperFunctions/axis.js"
 let queriedShipContainers = null
 
 function queryContainers(){
@@ -10,15 +9,15 @@ function queryContainers(){
 
 function resetShipLocations(){
     let queriedShips = getQueriedShips()
-    let shipLocations = getShipPositionsOnSetupBoard()
+
+    let shipLocations = []
     for (let i = 0; i < 5; i++) {
-        shipPutBackOnDisplay(i)
         if (queriedShips[i].getAttribute('data-onBoard') === "true") {
-            for (let j = 0; j < (queriedShips[i].getAttribute('data-shipLength')); j++) {
-                shipLocations[i][j].classList.remove('placedShip', 'validPlacement')
+            shipLocations = getShipLocations(queriedShips[i].id)
+            for (let j = 0; j < parseInt(shipLocations.length); j++) {
+                shipLocations[j].classList.remove('placedShip', 'validPlacement')
                 }
             }
-
         queriedShips[i].setAttribute('data-onBoard', "false");
         queriedShips[i].classList.remove("onBoard")
         queriedShips[i].classList.add("shipInDisplay")
@@ -32,8 +31,8 @@ function resetShipLocations(){
             }
         }        
         queriedShipContainers[i].appendChild(queriedShips[i]) 
+        shipPutBackOnDisplay(i)
     }
-    console.log(getShipLocations())
 }
 
 export {resetShipLocations, queryContainers}

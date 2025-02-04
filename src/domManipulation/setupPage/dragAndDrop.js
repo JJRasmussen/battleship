@@ -1,28 +1,20 @@
-import {recordPlacementOfShip, shipPutBackOnDisplay} from "./trackingShipPlacements.js"
-import {getQueriedShips} from "./queryShips.js"
-import {getAxis, changeAxis} from "./axis.js"
-//used in getCellindex to know which specific childElement was being grabbed when the parent ship is being dragged
+import {recordPlacementOfShip, shipPutBackOnDisplay, getShipAxis} from "./helperFunctions/trackingShipPlacements.js"
+import {getQueriedShips} from "./helperFunctions/queryShips.js"
+import {getAxis, changeAxis} from "./helperFunctions/axis.js"
+import {getShipLocations} from "./helperFunctions/trackingShipPlacements.js"
+import {startingCoordinate, coordinateWalk, validPlacement, queryValidatedCells} from "./helperFunctions/queryCells.js"
+
 let grabbedCellIndex = null
 let shipId = null
 let shipLength = null
 let shipAxis = null
-let currentValidationResult = []
-let currentCellsValidated = false
 let currentQueriedCells = []
 let lastQueriedCells = []
-let lastCellsValidated = []
-let lastValidationResult = []
 let currentCellsEntered = null
 let cellsLeftBehind = null
 let cellEntered = false
-
-//the ships are located on and between the noted coordinate
-let shipPositionsOnSetupBoard = [[],[],[],[],[]]
-
-function getShipPositionsOnSetupBoard(){
-    console.log(shipPositionsOnSetupBoard)
-    return shipPositionsOnSetupBoard
-}
+let validShipCoordinates = null
+let startCoordinate = ""
 
 function getCellIndex(e){
     grabbedCellIndex = e.target.getAttribute('data-index')
@@ -32,52 +24,11 @@ function dragOver(e){
     e.preventDefault()
 }
 
-function validPlacement(cellId){
-    let targetCells = []
-    let cellValidity = []
-    for (let i = 0; i < shipLength; i++) {
-        //
-        if(shipAxis === "topToBottom"){
-            let shiftAccordingToGrabbedCell = parseInt(cellId.slice(-1)) + i - grabbedCellIndex
-            targetCells[i] = cellId.slice(0, -1)
-            targetCells[i] = targetCells[i].concat(shiftAccordingToGrabbedCell)
-        } else {
-            let shiftAccordingToGrabbedCell = parseInt(cellId.slice(-2, -1)) + i - grabbedCellIndex
-            let rowStorage = cellId.slice(-1)
-            targetCells[i] = cellId.slice(0, -2)
-            targetCells[i] = targetCells[i].concat(shiftAccordingToGrabbedCell)
-            targetCells[i] = targetCells[i].concat(rowStorage)
-        }
-        //check if a cell will end outside of the board
-        if (document.querySelector("#" + targetCells[i]) === null){
-            targetCells[i] = null
-            cellValidity[i] = false
-            continue
-        }
-        targetCells[i] = document.querySelector("#" + targetCells[i])
-        //check if there already is a ship on one of the cells
-        if(targetCells[i].classList.contains("placedShip")) {
-            cellValidity[i] = false
-            continue
-        }
-        else{
-            cellValidity[i] = true
-        }        
-    }
-    currentValidationResult = cellValidity
-    currentQueriedCells = targetCells    
-    console.log("currentQueriedCells:")
-    for (let i = 0; i < shipLength; i++) {
-        console.log(currentQueriedCells[i]);
-        
-    }
-}
-
-function placementClassToggle(addOrRemove, cellsTargeted, testRequirement){
+function placementClassToggle(addOrRemove, cellsTargeted, validation){
     if(addOrRemove === "add"){
         for (let i = 0; i < cellsTargeted.length; i++) {
             if(cellsTargeted[i] === null){continue}
-            if(testRequirement){
+            if(validation === "true"){
                 cellsTargeted[i].classList.add("validPlacement")
             } else {
                 cellsTargeted[i].classList.add("invalidPlacement")
@@ -96,23 +47,19 @@ function placementClassToggle(addOrRemove, cellsTargeted, testRequirement){
 function dragEnter(e){
     //flag that new cells were entered
     cellEntered = true
-    //log queries and validation of the last cells
     lastQueriedCells = currentQueriedCells;
-    lastValidationResult = currentValidationResult;
-    lastCellsValidated = currentCellsValidated
-    //validate and query new cells
-    validPlacement(this.id);
-    currentCellsEntered = currentQueriedCells.filter(cell => cell != null);
-    currentCellsValidated = currentValidationResult.filter(Boolean).length.toString() === shipLength
-    console.log(currentCellsValidated)
-    //add class "validPlacement" or "invalidPlacement"
-    if(currentCellsValidated === true){
-        placementClassToggle("remove", currentQueriedCells, currentCellsValidated)
-        placementClassToggle("add", currentQueriedCells, currentCellsValidated)
+    startCoordinate = startingCoordinate(grabbedCellIndex, this.id, shipAxis)
+    let validationResults = validPlacement(startCoordinate, shipLength, shipAxis);
+    //query validated positions
+    let shipCoordinates = coordinateWalk(startCoordinate, shipLength, shipAxis)
+    currentQueriedCells = queryValidatedCells(shipCoordinates, validationResults)
+    if(currentQueriedCells.length === shipLength){
+        validShipCoordinates = "true"
     } else {
-        placementClassToggle("remove", currentCellsEntered, currentCellsValidated)
-        placementClassToggle("add", currentCellsEntered, currentCellsValidated)
+        validShipCoordinates = "false"
     }
+    placementClassToggle("remove", currentQueriedCells, validShipCoordinates)
+    placementClassToggle("add", currentQueriedCells, validShipCoordinates);
 }
 
 function dragLeave(e){
@@ -130,16 +77,12 @@ function dragLeave(e){
 
 function drag(e){
     e.stopPropagation()
-    shipLength = e.target.getAttribute('data-shipLength');
+    shipLength = parseInt(e.target.getAttribute('data-shipLength'));
     shipId = e.target.id;
-    if(e.target.classList.contains("topToBottom")){
-        shipAxis = "topToBottom"
-    } else {
-        shipAxis = "leftToRight"
-    }
+    shipAxis = getShipAxis(shipId)
     if (e.target.getAttribute('data-onBoard') === "true") {
     for (let i = 0; i < shipLength; i++) {
-        shipPositionsOnSetupBoard[parseInt(shipId.slice(-1))][i].classList.remove('placedShip', 'validPlacement')
+        getShipLocations(shipId)[i].classList.remove('placedShip','validPlacement')
         }
     }
 }
@@ -147,58 +90,31 @@ function drag(e){
 function drop(e){
     e.preventDefault();
     //all cells where the ship is being dropped needs to be available
-    if(currentValidationResult.filter(Boolean).length.toString() != shipLength){return}
+    if(validShipCoordinates === false){return}
 
     let droppedShip = getQueriedShips()[shipId.slice(-1)]
-    console.log(droppedShip)
-    //check if the ship has already been moved from the display onto the board
+    //if the ship is on the display move it to the board
     if (droppedShip.getAttribute('data-onBoard') === "false"){
-        //ship element moved to the board
         let boardContainer = document.querySelector("#boardPreparation")
         droppedShip.setAttribute('data-onBoard', "true")
         boardContainer.appendChild(droppedShip)
-        //change css styling so the ship overlaps correct cells
         droppedShip.classList.add("onBoard")
-        //change css styling so the ship is locked to its axis
         droppedShip.classList.remove("shipInDisplay")
-
     }       
-    //calculate the absolute placement is used so the movement goes downwards:
+    //calculate the absolute placement on the board:
     let cellWidth = e.target.offsetWidth
-    let columnPlacement = null
-    let rowPlacement = null
-    let targetColumn = null
-    let targetRow  = null
-    if (droppedShip.classList.contains("topToBottom")){
-        let shipAxis = "topToBottom"
-    } else {
-        let shipAxis = "leftToRight"
-    }
-    if(shipAxis === "topToBottom"){
-        let rowOffSet = grabbedCellIndex
-        targetRow = e.target.id.slice(-1) - rowOffSet
-        targetColumn = e.target.id.slice(-2, -1)
-    } else {
-        let columnOffSet = grabbedCellIndex
-        targetRow = e.target.id.slice(-1)
-        targetColumn = e.target.id.slice(-2, -1) - columnOffSet
-    }
-    columnPlacement = cellWidth * (targetColumn)
-    rowPlacement = cellWidth * (targetRow)      
-    droppedShip.style.left = `${columnPlacement}px`
-    droppedShip.style.top = `${rowPlacement}px`
+    let xCoordinate = startCoordinate.slice(-1)
+    let yCoordinate = startCoordinate.slice(-2, -1)    
+    droppedShip.style.left = `${cellWidth * (yCoordinate)}px`
+    droppedShip.style.top = `${cellWidth * (xCoordinate)  }px`
 
     //mark cells in the grid as occupied
     for (let i = 0; i < currentQueriedCells.length; i++) {
         currentQueriedCells[i].classList.remove("validPlacement", "invalidPlacement")
         currentQueriedCells[i].classList.add("placedShip")
     }
-    //record placement of the ships for dom manipulation  
-    for (let i = 0; i < shipLength; i++) {
-        shipPositionsOnSetupBoard[parseInt(shipId.slice(-1))][i] = currentQueriedCells[i]
-    }
     //make shipPlacementObjects for game board
-    recordPlacementOfShip(parseInt(shipId.slice(-1)), shipLength, currentQueriedCells[0].id.slice(-2), shipAxis)
+    recordPlacementOfShip(parseInt(shipId.slice(-1)), shipLength, startCoordinate, shipAxis)
 
     //reset varriables
     currentValidationResult = []
@@ -241,4 +157,4 @@ function dropOnDisplay(e){
 }
 
 
-export {dragOver, drop, dropOnDisplay, drag, dragEnter, dragLeave, getCellIndex, changeAxis, getShipPositionsOnSetupBoard}
+export {dragOver, drop, dropOnDisplay, drag, dragEnter, dragLeave, getCellIndex, changeAxis, validPlacement}

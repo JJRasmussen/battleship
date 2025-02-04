@@ -24,6 +24,11 @@ const boardCreation = (container, boardType) => {
             createCell.addEventListener("dragleave", dragLeave);
             createCell.addEventListener("dragenter", dragEnter);
             }
+            //DEV FEATURE:
+            //
+            createCell.textContent = String(i) + String(j)
+            //
+            //
             //attach cell to the given row
             targetRow.appendChild(createCell)
         }
