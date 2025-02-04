@@ -1,4 +1,4 @@
-import {recordPlacementOfShip, shipPutBackOnDisplay, getShipAxis} from "./helperFunctions/trackingShipPlacements.js"
+import {getOccupiedCells, recordPlacementOfShip, shipPutBackOnDisplay, getShipAxis} from "./helperFunctions/trackingShipPlacements.js"
 import {getQueriedShips} from "./helperFunctions/queryShips.js"
 import {getAxis, changeAxis} from "./helperFunctions/axis.js"
 import {getShipLocations} from "./helperFunctions/trackingShipPlacements.js"
@@ -8,11 +8,16 @@ let grabbedCellIndex = null
 let shipId = null
 let shipLength = null
 let shipAxis = null
+let currentValidationResult = []
+let currentCellsValidated = false
 let currentQueriedCells = []
 let lastQueriedCells = []
+let lastCellsValidated = []
+let lastValidationResult = []
 let currentCellsEntered = null
 let cellsLeftBehind = null
 let cellEntered = false
+let occupiedCells = ""
 let validShipCoordinates = null
 let startCoordinate = ""
 
