@@ -2,6 +2,7 @@ import {getAllShipLocations} from "../setupPage/helperFunctions/trackingShipPlac
 import {placeShipsOnBoard} from "./helperFunctions/shipsOnGameBoard.js"
 import {boardCreation} from "../makeGameBoard.js"
 import {getRandomEnemyShips} from "../setupPage/randomizeBoard.js"
+import {Gameboard} from "../../gamelogic/gameboard.js"
 const mainPage = document.querySelector(".mainPage")
 const newGameButton = document.querySelector(".newGameButton")
 
@@ -20,20 +21,30 @@ function startGame(){
     //create gameBoard with players ships
     boardCreation(playerBoard, "playerBoard")
     let shipLocations = getAllShipLocations()
+    let playerOneBoard = new Gameboard()
+    for (let i = 0; i < shipLocations.length; i++) {
+        playerOneBoard.placeShip(shipLocations[i].length, shipLocations[i].axis, String(shipLocations[i].startCoordinate))
+    }
     placeShipsOnBoard(shipLocations, "player");
 
+
     //make enemy boardContainer
-    const enemyBoard = document.createElement("div");
-    enemyBoard.setAttribute("class", "boardContainer");
-    enemyBoard.setAttribute("id", "enemyBoard");
-    gamePage.appendChild(enemyBoard);
+    const enemyBoardinDom = document.createElement("div");
+    enemyBoardinDom.setAttribute("class", "boardContainer");
+    enemyBoardinDom.setAttribute("id", "enemyBoard");
+    gamePage.appendChild(enemyBoardinDom);
     //get enemy positions
     let enemyShipLocations = getRandomEnemyShips()
     //create gameBoard with players ships
-    boardCreation(enemyBoard, "enemyBoard")
+    boardCreation(enemyBoardinDom, "enemyBoard")
+    let enemyBoard = new Gameboard()
+    for (let i = 0; i < shipLocations.length; i++) {
+        playerOneBoard.placeShip(shipLocations[i].length, shipLocations[i].axis, String(shipLocations[i].startCoordinate))
+    }
     placeShipsOnBoard(enemyShipLocations, "enemy");
 
 
+    
 /*
     //create setupBoard where ships will be placed
     boardCreation(boardContainer, "setupBoard");

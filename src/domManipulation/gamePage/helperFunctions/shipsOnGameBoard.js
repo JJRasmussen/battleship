@@ -10,7 +10,6 @@ function placeShipsOnBoard(shipPlacements, targetBoard){
             if(targetBoard === "enemy")
             targetCell = document.querySelector("#enemy_cell_" + shipCoordinates[j])
             targetCell.classList.add("shipOnPlayerBoard")
-
         }
     }
 };

@@ -16,24 +16,15 @@ class Gameboard{
 
     placeShip = (length, direction, coordinate) => {
         let newShip = new Ship(length);
-
-        if (direction === "topToBot"){
-            for (let index = 0; index < length; index++) {
-                if (this.board[coordinate[0] + index][coordinate[1]] instanceof Ship)
-                    {return "ERROR: overlapping ships"}
-            }
+        if (direction === "leftToRight"){
             for (let index = 0; index < length; index++){
-                this.board[coordinate[0] + index][coordinate[1]] = newShip
+                this.board[parseInt(coordinate[0]) + index][parseInt(coordinate[1])] = newShip
             }
             this.shipsOnBoard.push(newShip)
         }
-        if (direction === "leftToRight"){
-            for (let index = 0; index < length; index++) {
-                if (this.board[coordinate[0]][coordinate[1] + index] instanceof Ship)
-                    {return "ERROR: overlapping ships"}
-            }
+        if (direction === "topToBottom"){
             for (let index = 0; index < length; index++){
-                this.board[coordinate[0]][coordinate[1] + index] = newShip
+                this.board[parseInt(coordinate[0])][parseInt(coordinate[1]) + index] = newShip
             }
             this.shipsOnBoard.push(newShip)
         }
@@ -42,7 +33,8 @@ class Gameboard{
 
     receiveAttack = (coordinate) => {
         if (this.board[coordinate[0]][coordinate[1]] instanceof Ship){
-            return this.board[coordinate[0]][coordinate[1]].hit();
+            this.board[coordinate[0]][coordinate[1]].hit()
+            return "hit";
         } else {
             this.board[coordinate[0]][coordinate[1]] = "miss"
             return "miss"
